@@ -116,17 +116,18 @@ function SWEP:SecondaryAttack() end
 function SWEP:DeployShield()
 	timer.Simple( 0.4, function()
 		if CLIENT then return end
+
 		if self.Owner:Alive() and self.Owner:IsValid() then
-		-- thanks chief tiger
+			-- thanks chief tiger
 			local Owner = self.Owner
 			for k, v in pairs( Owner.Tacs ) do
 				timer.Simple( 0.1 * k, function()
-					if IsValid( v ) then
+					if v:IsValid() then
 						v:Remove()
 					end				
 					table.remove( Owner.Tacs, k )
 				end )
-			end	
+			end
 		end
 
 		local ent = ents.Create( "cod-tac-insert" )
@@ -136,6 +137,7 @@ function SWEP:DeployShield()
 		ent.Owner = self.Owner
 		ent:SetNWString( "TacOwner", self.Owner:Nick() )
 		ent:SetAngles( Angle( self.Owner:GetAngles().x, self.Owner:GetAngles().y, self.Owner:GetAngles().z ) + Angle( 0, -90, 0 ) )
+		table.insert( self.Owner.Tacs, ent )
 	end )
 
 	hook.Add( "PlayerSpawn", "TacSpawner", function( ply )
@@ -143,19 +145,14 @@ function SWEP:DeployShield()
 		if ply.Tacs == nil then ply.Tacs = {} end
 		for k, v in pairs( ply.Tacs ) do
 			timer.Simple( 0 * k, function()
-				if IsValid( v ) then
-					ply:SetPos( v:GetPos() )
-					ply:SetAngles( v:GetAngles() )
-				end				
+				if not v:IsValid() then return end
+				ply:SetPos( v:GetPos() )
+				ply:SetAngles( v:GetAngles() )			
 			end )
 		end
 	end )
 
-	timer.Simple( 1, function()
-		if IsValid( self.Weapon ) then
-			self.Weapon:Remove()
-		end
-	end )
+	timer.Simple( 1, function() if IsValid( self.Weapon ) then self.Weapon:Remove() end end )
 end
 
 function SWEP:SetNext()
