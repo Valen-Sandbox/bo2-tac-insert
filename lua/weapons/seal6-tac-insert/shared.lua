@@ -1,6 +1,6 @@
 AddCSLuaFile( "shared.lua" )
 
-SWEP.Author			= "Hoff"
+SWEP.Author		= "Hoff"
 SWEP.Category 		= "Other"
 SWEP.Spawnable		= true
 SWEP.AdminSpawnable	= true
@@ -12,24 +12,24 @@ SWEP.ViewModelFOV 	= 65
 SWEP.Primary.ClipSize		= -1
 SWEP.Primary.DefaultClip	= -1
 SWEP.Primary.Automatic		= true
-SWEP.Primary.Ammo			= ""
-SWEP.Primary.Delay			= 0
+SWEP.Primary.Ammo		= ""
+SWEP.Primary.Delay		= 0
 
 SWEP.Secondary.ClipSize		= -1
 SWEP.Secondary.DefaultClip	= -1
 SWEP.Secondary.Automatic	= false
-SWEP.Secondary.Ammo			= "none"
+SWEP.Secondary.Ammo		= "none"
 
-SWEP.Weight				= 5
+SWEP.Weight			= 5
 SWEP.AutoSwitchTo		= false
 SWEP.AutoSwitchFrom		= false
 
 SWEP.PrintName			= "Tactical Insertion"			
-SWEP.Slot				= 3
+SWEP.Slot			= 3
 SWEP.SlotPos			= 1
 SWEP.DrawAmmo			= false
 SWEP.DrawCrosshair		= true
-SWEP.DrawWeaponInfoBox	= false
+SWEP.DrawWeaponInfoBox		= false
 
 SWEP.Next = CurTime()
 SWEP.Primed = 0
@@ -114,9 +114,9 @@ end
 function SWEP:SecondaryAttack() end
 
 function SWEP:DeployShield()
-	timer.Simple( 0.4, function()
-		if CLIENT then return end
+	if CLIENT then return end
 
+	timer.Simple( 0.4, function()
 		if self.Owner:Alive() and self.Owner:IsValid() then
 			-- thanks chief tiger
 			local Owner = self.Owner
@@ -141,7 +141,6 @@ function SWEP:DeployShield()
 	end )
 
 	hook.Add( "PlayerSpawn", "TacSpawner", function( ply )
-		if CLIENT then return end
 		if ply.Tacs == nil then ply.Tacs = {} end
 		for k, v in pairs( ply.Tacs ) do
 			timer.Simple( 0 * k, function()
