@@ -3,7 +3,7 @@ AddCSLuaFile( "shared.lua" )
 include( "shared.lua" )
 
 ENT.HealthAmnt = 75 -- from ttt
-local zapSound = Sound("npc/assassin/ball_zap1.wav")
+local zapSound = "npc/assassin/ball_zap1.wav"
 
 function ENT:SpawnFunction( ply, tr )
 	if not tr.Hit then return end
@@ -14,7 +14,8 @@ function ENT:SpawnFunction( ply, tr )
 	ent:SetPos( spawnPos )
 	ent:Spawn()
 	ent:Activate()
-	ent:GetOwner( self.TacOwner )
+	ent:GetOwner()
+
 	return ent
 end
 
@@ -33,14 +34,6 @@ function ENT:Initialize()
 		phys:Wake()
 	end
 	self.Hit = false
-
-	self:SetDTFloat( 0, math.Rand( 0.5, 1.3 ) )
-	self:SetDTFloat( 1, math.Rand( 0.3, 1.2 ) )
-end
-
-function ENT:SetupDataTables()
-	self:DTVar( "Float", 0, "RotationSeed1" )
-	self:DTVar( "Float", 1, "RotationSeed2" )
 end
 
 function ENT:OnTakeDamage( dmg ) 
@@ -50,7 +43,7 @@ function ENT:OnTakeDamage( dmg )
 
 	self.HealthAmnt = self.HealthAmnt - dmg:GetDamage()
 
-	if not self.HealthAmnt <= 0 then return end
+	if self.HealthAmnt > 0 then return end
 	local effect = EffectData()
     effect:SetStart( self:GetPos() )
 	effect:SetOrigin( self:GetPos() )
@@ -60,6 +53,6 @@ function ENT:OnTakeDamage( dmg )
 	self:Remove()
 end
 
-function ENT:Use( activator, caller ) end
+function ENT:Use() end
 
 function ENT:Think() end

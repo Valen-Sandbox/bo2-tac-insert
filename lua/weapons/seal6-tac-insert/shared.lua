@@ -18,14 +18,14 @@ SWEP.Primary.Delay			= 0
 SWEP.Secondary.ClipSize		= -1
 SWEP.Secondary.DefaultClip	= -1
 SWEP.Secondary.Automatic	= false
-SWEP.Secondary.Ammo			= "none"
+SWEP.Secondary.Ammo			= ""
 
 SWEP.Weight				= 5
 SWEP.AutoSwitchTo		= false
 SWEP.AutoSwitchFrom		= false
 
 SWEP.PrintName			= "Tactical Insertion"			
-SWEP.Slot				= 3
+SWEP.Slot				= 4
 SWEP.SlotPos			= 1
 SWEP.DrawAmmo			= false
 SWEP.DrawCrosshair		= true
@@ -49,13 +49,14 @@ SWEP.Offset = {
 
 function SWEP:DrawWorldModel()
 	local hand, offset, rotate
-	if not IsValid( self.Owner ) then self:DrawModel() return end
+	local owner = self:GetOwner()
+	if not owner:IsValid() then self:DrawModel() return end
 
 	if not self.Hand then
-		self.Hand = self.Owner:LookupAttachment( "anim_attachment_rh" )
+		self.Hand = owner:LookupAttachment( "anim_attachment_rh" )
 	end
 
-	hand = self.Owner:GetAttachment( self.Hand )
+	hand = owner:GetAttachment( self.Hand )
 
 	if not hand then self:DrawModel() return end
 
@@ -71,18 +72,14 @@ function SWEP:DrawWorldModel()
 end
 
 function SWEP:Deploy()
-	self:SetNWString( "CanMelee", true )
 	self.Next = CurTime()
 	self.Primed = 0
-	self:SetNWString( "HasUsed", "false" )
-	self.Owner.Tacs = self.Owner.Tacs or {}
+	self:GetOwner().Tacs = self:GetOwner().Tacs or {}
 end
 
 function SWEP:Initialize()
 	self:SetWeaponHoldType( "fist" )
 end
-
-function SWEP:Equip( NewOwner ) end
 
 function SWEP:Holster()
 	self.Next = CurTime()
@@ -93,12 +90,13 @@ end
 function SWEP:PrimaryAttack()
 	if self:GetNWString( "clickclick" ) == "true" then return end
 	self:SetNWString( "clickclick", "true" )
+	local owner = self:GetOwner()
 
 	if self.Next < CurTime() and self.Primed == 0 then
 		self.Next = CurTime() + self.Primary.Delay
 		
-		if not self.Owner:IsValid() then return end
-		if self.Owner:Health() <= 0 then return end
+		if not owner:IsValid() then return end
+		if owner:Health() <= 0 then return end
 
 		timer.Simple( 0.6, function() if self:IsValid() then self:EmitSound( "hoff/mpl/seal_tac_insert/clip.wav" ) end end )
 		timer.Simple( 1.1, function() if self:IsValid() then self:EmitSound( "hoff/mpl/seal_tac_insert/beep.wav" ) end end )
@@ -111,43 +109,40 @@ function SWEP:PrimaryAttack()
 	end
 end
 
-function SWEP:SecondaryAttack() end
-
 function SWEP:DeployShield()
 	if CLIENT then return end
+	local owner = self:GetOwner()
 
 	timer.Simple( 0.4, function()
-		if self.Owner:Alive() and self.Owner:IsValid() then
+		if owner:Health() > 0 and owner:IsValid() then
 			-- thanks chief tiger
-			local Owner = self.Owner
-			for k, v in pairs( Owner.Tacs ) do
+			for k, v in pairs( owner.Tacs ) do
 				timer.Simple( 0.1 * k, function()
 					if v:IsValid() then
 						v:Remove()
 					end				
-					table.remove( Owner.Tacs, k )
+					table.remove( owner.Tacs, k )
 				end )
 			end
 		end
 
 		local ent = ents.Create( "cod-tac-insert" )
-		ent:SetPos( self.Owner:GetPos() )
+		ent:SetPos( owner:GetPos() )
 		ent:Spawn()
-		ent.TacOwner = self.Owner
-		ent.Owner = self.Owner
-		ent:SetNWString( "TacOwner", self.Owner:Nick() )
-		ent:SetAngles( Angle( self.Owner:GetAngles().x, self.Owner:GetAngles().y, self.Owner:GetAngles().z ) + Angle( 0, -90, 0 ) )
-		table.insert( self.Owner.Tacs, ent )
+		ent.Owner = owner
+		ent:SetNWString( "TacOwner", owner:Nick() )
+		ent:SetAngles( Angle( owner:GetAngles().x, owner:GetAngles().y, owner:GetAngles().z ) + Angle( 0, -90, 0 ) )
+		table.insert( owner.Tacs, ent )
 
 		if CPPI then
-    		ent:CPPISetOwner( self.Owner )
+    		ent:CPPISetOwner( owner )
 		end
 	end )
 
 	hook.Add( "PlayerSpawn", "TacSpawner", function( ply )
 		if ply.Tacs == nil then ply.Tacs = {} end
-		for k, v in pairs( ply.Tacs ) do
-			timer.Simple( 0 * k, function()
+		for _, v in pairs( ply.Tacs ) do
+			timer.Simple( 0, function()
 				if not v:IsValid() then return end
 				ply:SetPos( v:GetPos() )
 				ply:SetAngles( v:GetAngles() )			
@@ -160,13 +155,12 @@ end
 
 function SWEP:SetNext()
 	if self.Next < CurTime() + 0.5 then return end 
-	self:SetNWString( "HasUsed", "true" )
 	self.Next = CurTime()
 end
 
 function SWEP:Think()
 	if self.Next >= CurTime() then return end
-	if self.Primed == 1 and not self.Owner:KeyDown( IN_ATTACK ) then
+	if self.Primed == 1 and not self:GetOwner():KeyDown( IN_ATTACK ) then
 		self.Primed = 2
 		self:SetNext()			
 	elseif self.Primed == 2 and CurTime() > self.Next + 2 then
@@ -179,8 +173,4 @@ end
 function SWEP:SecondaryAttack()
 	self:SetNextPrimaryFire( CurTime() + 1.1 )
 	self:SetNextSecondaryFire( CurTime() + 1.2 )
-end
-
-function SWEP:ShouldDropOnDie()
-	return false
 end
