@@ -1,6 +1,6 @@
 AddCSLuaFile( "shared.lua" )
 
-SWEP.Author		= "Hoff"
+SWEP.Author			= "Hoff"
 SWEP.Category 		= "Other"
 SWEP.Spawnable		= true
 SWEP.AdminSpawnable	= true
@@ -12,24 +12,24 @@ SWEP.ViewModelFOV 	= 65
 SWEP.Primary.ClipSize		= -1
 SWEP.Primary.DefaultClip	= -1
 SWEP.Primary.Automatic		= true
-SWEP.Primary.Ammo		= ""
-SWEP.Primary.Delay		= 0
+SWEP.Primary.Ammo			= ""
+SWEP.Primary.Delay			= 0
 
 SWEP.Secondary.ClipSize		= -1
 SWEP.Secondary.DefaultClip	= -1
 SWEP.Secondary.Automatic	= false
-SWEP.Secondary.Ammo		= "none"
+SWEP.Secondary.Ammo			= "none"
 
-SWEP.Weight			= 5
+SWEP.Weight				= 5
 SWEP.AutoSwitchTo		= false
 SWEP.AutoSwitchFrom		= false
 
 SWEP.PrintName			= "Tactical Insertion"			
-SWEP.Slot			= 3
+SWEP.Slot				= 3
 SWEP.SlotPos			= 1
 SWEP.DrawAmmo			= false
 SWEP.DrawCrosshair		= true
-SWEP.DrawWeaponInfoBox		= false
+SWEP.DrawWeaponInfoBox	= false
 
 SWEP.Next = CurTime()
 SWEP.Primed = 0
@@ -138,6 +138,10 @@ function SWEP:DeployShield()
 		ent:SetNWString( "TacOwner", self.Owner:Nick() )
 		ent:SetAngles( Angle( self.Owner:GetAngles().x, self.Owner:GetAngles().y, self.Owner:GetAngles().z ) + Angle( 0, -90, 0 ) )
 		table.insert( self.Owner.Tacs, ent )
+
+		if CPPI then
+    		ent:CPPISetOwner( self.Owner )
+		end
 	end )
 
 	hook.Add( "PlayerSpawn", "TacSpawner", function( ply )
@@ -161,7 +165,7 @@ function SWEP:SetNext()
 end
 
 function SWEP:Think()
-	if not self.Next < CurTime() then return end
+	if self.Next >= CurTime() then return end
 	if self.Primed == 1 and not self.Owner:KeyDown( IN_ATTACK ) then
 		self.Primed = 2
 		self:SetNext()			

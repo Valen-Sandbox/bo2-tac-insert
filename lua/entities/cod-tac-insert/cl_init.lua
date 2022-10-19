@@ -30,7 +30,8 @@ hook.Add( "HUDPaint", "TacInsertText", function()
 	local textX = ScrW() / 2
 	local textY = ScrH() / 2 + 150
 	local playerToEntDistance = LocalPlayer():GetPos():Distance( visibleEnt:GetPos() )
+
 	if entityClass  == "cod-tac-insert" then
-		draw.DrawText( visibleEnt:GetNWString( "TacOwner" ).."'s Tactical Insertion", "arialf", textX, textY, textColor, TEXT_ALIGN_CENTER )
+		draw.DrawText( visibleEnt:GetNWString( "TacOwner" ) .."'s Tactical Insertion", "arialf", textX, textY, textColor, TEXT_ALIGN_CENTER )
 	end
 end )
