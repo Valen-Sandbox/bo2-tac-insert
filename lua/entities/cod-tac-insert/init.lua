@@ -19,16 +19,16 @@ function ENT:SpawnFunction( ply, tr )
 	return ent
 end
 
-function ENT:Initialize()	
-	self.Entity:SetModel( "models/hoff/weapons/tac_insert/w_tac_insert.mdl" )
-	self.Entity:PhysicsInit( SOLID_VPHYSICS )
-	self.Entity:SetMoveType( MOVETYPE_NONE )
-	self.Entity:SetSolid( SOLID_VPHYSICS )
-	self.Entity:SetCollisionGroup( COLLISION_GROUP_WEAPON )
-	self.Entity:DrawShadow( false )
-	self.Entity:SetMaxHealth( 5 )
-	self.Entity:SetHealth( 5 )
-	local phys = self.Entity:GetPhysicsObject()
+function ENT:Initialize()
+	self:SetModel( "models/hoff/weapons/tac_insert/w_tac_insert.mdl" )
+	self:PhysicsInit( SOLID_VPHYSICS )
+	self:SetMoveType( MOVETYPE_NONE )
+	self:SetSolid( SOLID_VPHYSICS )
+	self:SetCollisionGroup( COLLISION_GROUP_WEAPON )
+	self:DrawShadow( false )
+	self:SetMaxHealth( 5 )
+	self:SetHealth( 5 )
+	local phys = self:GetPhysicsObject()
 
 	if phys:IsValid() then
 		phys:Wake()
@@ -36,23 +36,19 @@ function ENT:Initialize()
 	self.Hit = false
 end
 
-function ENT:OnTakeDamage( dmg ) 
+function ENT:OnTakeDamage( dmg )
 	self:TakePhysicsDamage( dmg )
- 
+
 	if self.HealthAmnt <= 0 then return end
 
 	self.HealthAmnt = self.HealthAmnt - dmg:GetDamage()
 
 	if self.HealthAmnt > 0 then return end
 	local effect = EffectData()
-    effect:SetStart( self:GetPos() )
+	effect:SetStart( self:GetPos() )
 	effect:SetOrigin( self:GetPos() )
 	util.Effect( "cball_explode", effect, true, true )
 
 	sound.Play( zapSound, self:GetPos(), 100, 100 )
 	self:Remove()
 end
-
-function ENT:Use() end
-
-function ENT:Think() end

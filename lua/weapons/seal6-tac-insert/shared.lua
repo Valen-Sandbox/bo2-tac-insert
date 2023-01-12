@@ -24,7 +24,7 @@ SWEP.Weight				= 5
 SWEP.AutoSwitchTo		= false
 SWEP.AutoSwitchFrom		= false
 
-SWEP.PrintName			= "Tactical Insertion"			
+SWEP.PrintName			= "Tactical Insertion"
 SWEP.Slot				= 4
 SWEP.SlotPos			= 1
 SWEP.DrawAmmo			= false
@@ -48,7 +48,7 @@ SWEP.Offset = {
 }
 
 function SWEP:DrawWorldModel()
-	local hand, offset, rotate
+	local hand, offset
 	local owner = self:GetOwner()
 	if not owner:IsValid() then self:DrawModel() return end
 
@@ -94,7 +94,7 @@ function SWEP:PrimaryAttack()
 
 	if self.Next < CurTime() and self.Primed == 0 then
 		self.Next = CurTime() + self.Primary.Delay
-		
+
 		if not owner:IsValid() then return end
 		if owner:Health() <= 0 then return end
 
@@ -104,7 +104,7 @@ function SWEP:PrimaryAttack()
 		timer.Simple( 1.7, function() if self:IsValid() then self:EmitSound( "hoff/mpl/seal_tac_insert/flick_1.wav" ) end end )
 		timer.Simple( 1.8, function() if self:IsValid() then self:EmitSound( "hoff/mpl/seal_tac_insert/flick_2.wav" ) end end )
 
-		self.Weapon:SendWeaponAnim( ACT_VM_PULLPIN )
+		self:SendWeaponAnim( ACT_VM_PULLPIN )
 		self.Primed = 1
 	end
 end
@@ -120,7 +120,7 @@ function SWEP:DeployShield()
 				timer.Simple( 0.1 * k, function()
 					if v:IsValid() then
 						v:Remove()
-					end				
+					end
 					table.remove( owner.Tacs, k )
 				end )
 			end
@@ -135,7 +135,7 @@ function SWEP:DeployShield()
 		table.insert( owner.Tacs, ent )
 
 		if CPPI then
-    		ent:CPPISetOwner( owner )
+			ent:CPPISetOwner( owner )
 		end
 	end )
 
@@ -145,16 +145,16 @@ function SWEP:DeployShield()
 			timer.Simple( 0, function()
 				if not v:IsValid() then return end
 				ply:SetPos( v:GetPos() )
-				ply:SetAngles( v:GetAngles() )			
+				ply:SetAngles( v:GetAngles() )
 			end )
 		end
 	end )
 
-	timer.Simple( 1, function() if IsValid( self.Weapon ) then self.Weapon:Remove() end end )
+	timer.Simple( 1, function() if IsValid( self ) then self:Remove() end end )
 end
 
 function SWEP:SetNext()
-	if self.Next < CurTime() + 0.5 then return end 
+	if self.Next < CurTime() + 0.5 then return end
 	self.Next = CurTime()
 end
 
@@ -162,11 +162,11 @@ function SWEP:Think()
 	if self.Next >= CurTime() then return end
 	if self.Primed == 1 and not self:GetOwner():KeyDown( IN_ATTACK ) then
 		self.Primed = 2
-		self:SetNext()			
+		self:SetNext()
 	elseif self.Primed == 2 and CurTime() > self.Next + 2 then
 		self.Primed = 0
 		self:DeployShield()
-		self.Weapon:SendWeaponAnim( ACT_VM_THROW )	
+		self:SendWeaponAnim( ACT_VM_THROW )
 	end
 end
 
