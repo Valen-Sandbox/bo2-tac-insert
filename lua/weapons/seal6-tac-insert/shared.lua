@@ -190,19 +190,16 @@ function SWEP:DeployShield()
 				if not IsValid( ply ) then return end
 				if ply:Health() <= 0 then return end
 
-				--for k2, v2 in pairs( ply.Tacs ) do
-					--timer.Simple( 0 * k2, function()
-						if IsValid( v ) then
-							local effect = EffectData()
-							effect:SetStart( v:GetPos() )
-							effect:SetOrigin( v:GetPos() )
-							util.Effect( "cball_explode", effect, true, true )
-							sound.Play( zapSound, v:GetPos(), 100, 100 )
-							v:Remove()
-						end
-						table.remove( ply.Tacs, k )
-					--end )
-				--end
+				if IsValid( v ) then
+					local effect = EffectData()
+					effect:SetStart( v:GetPos() )
+					effect:SetOrigin( v:GetPos() )
+					util.Effect( "cball_explode", effect, true, true )
+					sound.Play( zapSound, v:GetPos(), 100, 100 )
+					v:Remove()
+				end
+
+				table.remove( ply.Tacs, k )
 			end )
 		end
 	end )
