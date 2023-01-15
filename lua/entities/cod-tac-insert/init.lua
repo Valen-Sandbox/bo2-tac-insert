@@ -2,8 +2,11 @@ AddCSLuaFile( "cl_init.lua" )
 AddCSLuaFile( "shared.lua" )
 include( "shared.lua" )
 
+ENT.CanUse = true
+ENT.RespawnCounter = 0
 ENT.HealthAmnt = 75 -- from ttt
 local zapSound = "npc/assassin/ball_zap1.wav"
+local pickupSound = "hoff/mpl/seal_tac_insert/ammo.wav"
 
 function ENT:SpawnFunction( ply, tr )
 	if not tr.Hit then return end
@@ -50,5 +53,43 @@ function ENT:OnTakeDamage( dmg )
 	util.Effect( "cball_explode", effect, true, true )
 
 	sound.Play( zapSound, self:GetPos(), 100, 100 )
+	local owner = self:GetNWEntity( "TacOwnerEnt" )
+	owner:ChatPrint( "Your Tactical Insertion has been destroyed!" )
 	self:Remove()
+end
+
+function ENT:Use( activator )
+	if not SERVER then return end
+	local owner = self:GetNWEntity( "TacOwnerEnt" )
+
+	if not IsValid( owner ) then return end
+	if activator ~= owner then return end
+	if not self.CanUse then return end
+	self.CanUse = false
+	if owner:Health() <= 0 then return end
+
+	for k, v in pairs( owner.Tacs ) do
+		timer.Simple( 0, function()
+			if IsValid( v ) then
+				if not owner:HasWeapon( "seal6-tac-insert" ) then
+					owner:Give( "seal6-tac-insert" )
+					owner:EmitSound( pickupSound )
+				else
+					local effect = EffectData()
+					effect:SetStart( v:GetPos() )
+					effect:SetOrigin( v:GetPos() )
+					util.Effect( "cball_explode", effect, true, true )
+					sound.Play( zapSound, v:GetPos(), 100, 100 )
+				end
+
+				v:Remove()
+			end
+
+			table.remove( owner.Tacs, k )
+		end )
+	end
+end
+
+function ENT:CanTool()
+	return false
 end

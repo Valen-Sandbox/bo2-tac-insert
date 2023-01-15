@@ -28,4 +28,7 @@ hook.Add( "HUDPaint", "TacInsertText", function()
 	local textX = ScrW() / 2
 	local textY = ScrH() / 2 + 150
 	draw.DrawText( visibleEnt:GetNWString( "TacOwner" ) .. "'s Tactical Insertion", textFont, textX, textY, textColor, TEXT_ALIGN_CENTER )
+
+	if visibleEnt:GetNWEntity( "TacOwnerEnt" ) ~= locPly then return end
+	draw.DrawText( "Press E to Pick Up", textFont, textX, textY + 50, textColor, TEXT_ALIGN_CENTER )
 end )
