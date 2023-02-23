@@ -1,0 +1,6 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/hoff/weapons/tac_insert/tac_insert_screen_c"
+	"$surfaceprop" "Default"
+	$selfillum 1
+}

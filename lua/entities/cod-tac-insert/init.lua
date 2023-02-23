@@ -4,11 +4,12 @@ include( "shared.lua" )
 
 ENT.CanUse = true
 ENT.RespawnCounter = 0
-ENT.HealthAmnt = 75 -- from ttt
+ENT.HealthAmnt = 75 -- From TTT
+
 local zapSound = "npc/assassin/ball_zap1.wav"
 local pickupSound = "hoff/mpl/seal_tac_insert/ammo.wav"
 
-function ENT:SpawnFunction( ply, tr )
+function ENT:SpawnFunction( _, tr )
 	if not tr.Hit then return end
 
 	local spawnPos = tr.HitPos + tr.HitNormal * 16
@@ -53,14 +54,15 @@ function ENT:OnTakeDamage( dmg )
 	util.Effect( "cball_explode", effect, true, true )
 
 	sound.Play( zapSound, self:GetPos(), 100, 100 )
-	local owner = self:GetNWEntity( "TacOwnerEnt" )
+	local owner = self:GetOwner()
 	owner:ChatPrint( "Your Tactical Insertion has been destroyed!" )
+	hook.Remove( "PlayerSpawn", "TacInsert_Spawner_" .. self:GetNWString( "TacOwnerID" ) )
 	self:Remove()
 end
 
 function ENT:Use( activator )
 	if not SERVER then return end
-	local owner = self:GetNWEntity( "TacOwnerEnt" )
+	local owner = self:GetOwner()
 
 	if not IsValid( owner ) then return end
 	if activator ~= owner then return end
@@ -85,6 +87,7 @@ function ENT:Use( activator )
 				v:Remove()
 			end
 
+			hook.Remove( "PlayerSpawn", "TacInsert_Spawner_" .. self:GetNWString( "TacOwnerID" ) )
 			table.remove( owner.Tacs, k )
 		end )
 	end
@@ -93,3 +96,17 @@ end
 function ENT:CanTool()
 	return false
 end
+
+function ENT:PhysgunPickup( _, ent )
+	if not IsValid( ent ) then return end
+	if ent:GetClass() ~= self:GetClass() then return end
+
+	return false
+end
+
+hook.Add( "PhysgunPickup", "TacInsert_StopPhysgun", function( ply, ent )
+	if not IsValid( ent ) then return end
+	if not ent.PhysgunPickup then return end
+
+	return ent:PhysgunPickup( ply, ent )
+end )

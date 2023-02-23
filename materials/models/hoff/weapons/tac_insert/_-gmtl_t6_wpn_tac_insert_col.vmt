@@ -2,4 +2,5 @@
 {
 	"$basetexture" "models/hoff/weapons/tac_insert/_-gmtl_t6_wpn_tac_insert_col"
 	"$surfaceprop" "Default"
+	"$bumpmap" "models/hoff/weapons/tac_insert/_-gmtl_t6_wpn_tac_insert_n"
 }
