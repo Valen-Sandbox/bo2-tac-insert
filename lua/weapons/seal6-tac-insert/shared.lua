@@ -87,7 +87,7 @@ function SWEP:Deploy()
 end
 
 function SWEP:Initialize()
-	self:SetWeaponHoldType( "fist" )
+	self:SetHoldType( "fist" )
 end
 
 function SWEP:Holster()
