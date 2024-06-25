@@ -13,6 +13,12 @@ local animationSpeed = 0.5 -- Seconds to go from start to end
 local startScale = 1.5
 local endScale = 0.1
 
+local vecRenderStripe = Vector( 0, 0, 28 )
+local vecRenderSpread = Vector( 0, 0, 36 )
+local vecRenderHeadlight = Vector( 0, 0, 3.2 )
+local vecStartOffset = Vector( 0, 0, 18 )
+local vecEndOffset = Vector( 0, 0, 48 )
+
 function ENT:Draw()
 	self:DrawModel()
 
@@ -20,28 +26,30 @@ function ENT:Draw()
 	local angle = Angle( 0, LocalPlayer():EyeAngles().yaw, 0 )
 
 	angle.Pitch = angle.Pitch - 180
+	local forward = angle:Forward()
+
 	render.SetMaterial( matWhiteStripe )
-	render.DrawQuadEasy( pos + Vector( 0, 0, 28 ), angle:Forward(), 3, 70, drawColor, angle.pitch )
+	render.DrawQuadEasy( pos + vecRenderStripe, forward, 3, 70, drawColor, angle.pitch )
 
 	render.SetMaterial( matRaySpread )
-	render.DrawQuadEasy( pos + Vector( 0, 0, 36 ), angle:Forward(), 60, 70, drawColor, angle.pitch )
+	render.DrawQuadEasy( pos + vecRenderSpread, forward, 60, 70, drawColor, angle.pitch )
 
 	render.SetMaterial( matHeadlight )
-	render.DrawQuadEasy( pos + Vector( 0, 0, 3.2 ), angle:Up(), 12, 12, drawColor, angle.pitch + 64 )
+	render.DrawQuadEasy( pos + vecRenderHeadlight, angle:Up(), 12, 12, drawColor, angle.pitch + 64 )
 
-	local startPos = pos + Vector( 0, 0, 18 )
-	local endPos = pos + Vector( 0, 0, 48 )
+	local startPos = pos + vecStartOffset
+	local endPos = pos + vecEndOffset
 
-	local delta = ( CurTime() - startTime ) / animationSpeed
-	delta = math.Clamp( delta, 0, 1 )
 	local curTime = CurTime()
+	local delta = ( curTime - startTime ) / animationSpeed
+	delta = math.Clamp( delta, 0, 1 )
 
 	if curTime < startTime + animationSpeed then -- Animation is still running
 		local progress = ( curTime - startTime ) / animationSpeed
 		local currentPos = LerpVector( progress, startPos, endPos )
 		local currentScale = Lerp( delta, startScale, endScale )
 		render.SetMaterial( matWhiteStripe )
-		render.DrawQuadEasy( currentPos, angle:Forward(), 5 * currentScale, 28, drawColor, angle.pitch )
+		render.DrawQuadEasy( currentPos, forward, 5 * currentScale, 28, drawColor, angle.pitch )
 	else -- Animation has finished, reset the start time for the next animation
 		startTime = curTime
 	end

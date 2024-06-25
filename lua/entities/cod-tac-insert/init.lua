@@ -54,9 +54,15 @@ function ENT:OnTakeDamage( dmg )
 	util.Effect( "cball_explode", effect, true, true )
 
 	sound.Play( zapSound, self:GetPos(), 100, 100 )
+
 	local owner = self:GetOwner()
-	owner:ChatPrint( "Your Tactical Insertion has been destroyed!" )
+
+	if IsValid(owner) then
+		owner:ChatPrint( "Your Tactical Insertion has been destroyed!" )
+	end
+
 	hook.Remove( "PlayerSpawn", "TacInsert_Spawner_" .. self:GetNWString( "TacOwnerID" ) )
+
 	self:Remove()
 end
 
