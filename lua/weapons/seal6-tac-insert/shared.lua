@@ -55,10 +55,7 @@ local beepSound = "hoff/mpl/seal_tac_insert/beep.wav"
 local flick1Sound = "hoff/mpl/seal_tac_insert/flick_1.wav"
 local flick2Sound = "hoff/mpl/seal_tac_insert/flick_2.wav"
 
-hook.Add( "Initialize", "TacInsert_CreateConvars", function()
-	if ConVarExists( "sv_tacinsert_respawnlimit" ) then return end
-	CreateConVar( "sv_tacinsert_respawnlimit", 0, { CHEAT, FCVAR_REPLICATED } )
-end )
+local respawnLimitCvar = CreateConVar( "sv_tacinsert_respawnlimit", 0, { CHEAT, FCVAR_REPLICATED } )
 
 function SWEP:DrawWorldModel()
 	local owner = self:GetOwner()
@@ -197,7 +194,7 @@ function SWEP:DeployShield()
 				ply:SetAngles( v:GetAngles() )
 
 				v.RespawnCounter = v.RespawnCounter + 1
-				local respawnLimit = GetConVar( "sv_tacinsert_respawnlimit" ):GetInt()
+				local respawnLimit = respawnLimitCvar:GetInt()
 
 				if respawnLimit <= 0 then return end
 				if v.RespawnCounter < respawnLimit then return end
