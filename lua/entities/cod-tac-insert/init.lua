@@ -41,9 +41,11 @@ function ENT:Initialize()
 end
 
 function ENT:OnTakeDamage( dmg )
-	self:TakePhysicsDamage( dmg )
+	if self.HealthAmnt <= 0 then
+		self:TakePhysicsDamage( dmg )
 
-	if self.HealthAmnt <= 0 then return end
+		return
+	end
 
 	self.HealthAmnt = self.HealthAmnt - dmg:GetDamage()
 
