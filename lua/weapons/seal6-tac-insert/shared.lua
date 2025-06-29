@@ -165,7 +165,7 @@ function SWEP:DeployShield()
 			local undoEnt = undoList.Entities[1]
 
 			-- Check if the entity is still valid
-			if IsValid( undoEnt ) then
+			if owner.Tacs and IsValid( undoEnt ) then
 				-- Remove the entity from the owner's Tac table
 				table.RemoveByValue( owner.Tacs, undoEnt )
 			else
