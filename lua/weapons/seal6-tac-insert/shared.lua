@@ -1,6 +1,7 @@
 AddCSLuaFile( "shared.lua" )
 
 SWEP.Author			= "Hoff"
+SWEP.Instructions	= "Left click to place a Tactical Insertion that you will respawn at upon death.\nPress E on your Tactical Insertion to pick it back up."
 SWEP.Category 		= "Other"
 SWEP.Spawnable		= true
 SWEP.AdminSpawnable	= true
